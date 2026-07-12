@@ -61,4 +61,14 @@ export const createTrip = async (data) => {
   return response.data;
 };
 
+export const getTrips = async () => {
+  const response = await api.get('/get_trips');
+  return response.data;
+};
+
+export const updateTripStatus = async (data) => {
+  const response = await api.put('/trip_status', data);
+  return response.data;
+};
+
 export default api;

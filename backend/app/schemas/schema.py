@@ -47,3 +47,7 @@ class TripData(BaseModel):
     cargo_weight: Optional[float] = None
     distance: Optional[float] = None
     status: Optional[str] = "Draft"
+
+class UpdateTripStatus(BaseModel):
+    trip_id: int
+    status: str

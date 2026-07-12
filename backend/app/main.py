@@ -2,13 +2,13 @@
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from app.schemas.schema import DriverData, TripData, UpdateDriverStatus, UserLogin, UserRegister, VehicleData,UpdateVehicleStatus
+from app.schemas.schema import DriverData, TripData, UpdateDriverStatus, UserLogin, UserRegister, VehicleData,UpdateVehicleStatus, UpdateTripStatus
 from app.api.routes import router as api_router
 from app.core.config import settings
 from app.api.auth import auth_regst,auth_login
 from app.api.vehicle import get_all_vehicles, register_vehicle,update_vehicle_status
 from app.api.driver import add_driver, get_all_drivers, update_driver_status
-from app.api.trip import create_trip, get_available_drivers, get_available_vehicles
+from app.api.trip import create_trip, get_available_drivers, get_available_vehicles, get_all_trips, update_trip_status
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -73,3 +73,13 @@ async def available_vehicles(response: Response):
 @app.get("/drivers_available")
 async def available_drivers(response: Response):
     return await get_available_drivers(response)
+
+
+@app.get("/get_trips")
+async def get_trips(response: Response):
+    return await get_all_trips(response)
+
+
+@app.put("/trip_status")
+async def trip_status(data: UpdateTripStatus, response: Response):
+    return await update_trip_status(response, data)

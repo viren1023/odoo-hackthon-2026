@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { getAvailableVehicles, getAvailableDrivers, createTrip } from "../services/api";
+import { getAvailableVehicles, getAvailableDrivers, createTrip, getTrips, updateTripStatus } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import {
   Truck,
@@ -44,12 +44,26 @@ export default function TripsPage() {
   useEffect(() => {
     const fetchResources = async () => {
       try {
-        const [vehiclesRes, driversRes] = await Promise.all([
+        const [vehiclesRes, driversRes, tripsRes] = await Promise.all([
           getAvailableVehicles(),
           getAvailableDrivers(),
+          getTrips(),
         ]);
         setAvailableVehicles(vehiclesRes || []);
         setAvailableDrivers(driversRes || []);
+        
+        if (tripsRes && tripsRes.length > 0) {
+          // Format trips from backend
+          const formattedTrips = tripsRes.map(t => ({
+            id: `TR${t.id}`,
+            source: t.source,
+            destination: t.destination,
+            assignment: `${t.vehicle_name || 'Unassigned'} / ${t.driver_name || 'Unassigned'}`,
+            status: t.status,
+            note: ""
+          }));
+          setLiveBoard(formattedTrips);
+        }
         
         if (vehiclesRes?.length > 0 && driversRes?.length > 0) {
           setForm(prev => ({
@@ -132,12 +146,62 @@ export default function TripsPage() {
       setAvailableVehicles(prev => prev.filter(v => v.id.toString() !== form.vehicleId));
       setAvailableDrivers(prev => prev.filter(d => d.id.toString() !== form.driverId));
       
+      // Also fetch trips again to refresh board properly
+      const tripsRes = await getTrips();
+      if (tripsRes) {
+        const formattedTrips = tripsRes.map(t => ({
+          id: `TR${t.id}`,
+          source: t.source,
+          destination: t.destination,
+          assignment: `${t.vehicle_name || 'Unassigned'} / ${t.driver_name || 'Unassigned'}`,
+          status: t.status,
+          note: ""
+        }));
+        setLiveBoard(formattedTrips);
+      }
+      
       setTimeout(resetForm, 1200);
     } catch (err) {
       console.error("Failed to dispatch trip", err);
       alert(err.response?.data?.msg || "Failed to dispatch trip");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleTripStatusChange = async (tripId, newStatus) => {
+    try {
+      // The tripId in the UI has a 'TR' prefix, e.g., TR12. The DB expects an integer ID.
+      const rawId = parseInt(tripId.replace('TR', ''), 10);
+      
+      await updateTripStatus({ trip_id: rawId, status: newStatus });
+      
+      // If status is Completed or Cancelled, it frees up resources, so we re-fetch them.
+      if (newStatus === "Completed" || newStatus === "Cancelled") {
+        const [vehiclesRes, driversRes] = await Promise.all([
+          getAvailableVehicles(),
+          getAvailableDrivers(),
+        ]);
+        setAvailableVehicles(vehiclesRes || []);
+        setAvailableDrivers(driversRes || []);
+      }
+
+      // Re-fetch trips to ensure everything is synced
+      const tripsRes = await getTrips();
+      if (tripsRes) {
+        const formattedTrips = tripsRes.map(t => ({
+          id: `TR${t.id}`,
+          source: t.source,
+          destination: t.destination,
+          assignment: `${t.vehicle_name || 'Unassigned'} / ${t.driver_name || 'Unassigned'}`,
+          status: t.status,
+          note: ""
+        }));
+        setLiveBoard(formattedTrips);
+      }
+    } catch (err) {
+      console.error("Failed to update trip status", err);
+      alert(err.response?.data?.msg || "Failed to update trip status.");
     }
   };
 
@@ -331,11 +395,21 @@ export default function TripsPage() {
                         <p className="text-sm text-slate-700 text-right shrink-0">{trip.assignment}</p>
                       </div>
                       <div className="flex items-center justify-between mt-3">
-                        <span
-                          className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${statusStyles[trip.status]}`}
+                        <select
+                          value={trip.status}
+                          onChange={(e) => handleTripStatusChange(trip.id, e.target.value)}
+                          disabled={trip.status === "Completed" || trip.status === "Cancelled"}
+                          className={`inline-block px-3 py-1 rounded-full text-xs font-medium border-none outline-none appearance-none ${
+                            trip.status === "Completed" || trip.status === "Cancelled" 
+                              ? 'cursor-not-allowed opacity-80' 
+                              : 'cursor-pointer'
+                          } ${statusStyles[trip.status] || 'bg-slate-100 text-slate-700'}`}
                         >
-                          {trip.status}
-                        </span>
+                          <option value="Draft" disabled={trip.status !== "Draft"}>Draft</option>
+                          <option value="Dispatched">Dispatched</option>
+                          <option value="Completed">Completed</option>
+                          <option value="Cancelled">Cancelled</option>
+                        </select>
                         <span className="text-xs text-slate-400">{trip.note}</span>
                       </div>
                     </div>
