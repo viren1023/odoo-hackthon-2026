@@ -171,32 +171,39 @@ async def get_available_drivers(response: Response):
             con.close()
         db.close()
 
-async def get_all_trips(response: Response):
+async def get_all_trips(response: Response, data):
     db = database()
     con = None
+
     try:
         con = db.cursor(dictionary=True)
+
         query = """
-            SELECT 
-                t.id, 
-                t.source, 
-                t.destination, 
-                t.status, 
-                v.Vname as vehicle_name, 
-                d.name as driver_name 
+            SELECT
+                t.id,
+                t.source,
+                t.destination,
+                t.status,
+                v.Vname AS vehicle_name,
+                d.name AS driver_name
             FROM trip t
             LEFT JOIN vehicles v ON t.vehicle_id = v.id
             LEFT JOIN drivers d ON t.driver_id = d.id
+            WHERE t.uid = %s
             ORDER BY t.id DESC
         """
-        con.execute(query)
+
+        con.execute(query, (data.uid,))
         trips = con.fetchall()
+
         response.status_code = status.HTTP_200_OK
         return trips
+
     except Exception as e:
         traceback.print_exc()
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"msg": str(e)}
+
     finally:
         if con:
             con.close()
