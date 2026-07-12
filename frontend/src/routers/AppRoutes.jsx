@@ -6,11 +6,11 @@ import AppLayout from '../components/layout/AppLayout.jsx';
 
 import LoginPage from '../pages/LoginPage.jsx';
 import RegisterPage from '../pages/RegisterPage.jsx';
-// import DashboardPage from '../pages/DashboardPage.jsx';
-import VehicleRegistryPage from '../pages/VehicleRegistryPage.jsx';
+import DashboardPage from '../pages/DashboardPage.jsx';
+import VehicleRegistryPage from '../pages/VehicleregisterayPage.jsx'
 // import DriverManagementPage from '../pages/DriverManagementPage.jsx';
 // import TripManagementPage from '../pages/TripManagementPage.jsx';
-import MaintenancePage from '../pages/MaintenancePage.jsx';
+import MaintenancePage from '../pages/MaintenencePage.jsx'
 // import FuelExpensePage from '../pages/FuelExpensePage.jsx';
 // import ReportsPage from '../pages/ReportsPage.jsx';
 // import UnauthorizedPage from '../pages/UnauthorizedPage.jsx';
@@ -79,7 +79,7 @@ export default function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           {/* 3.2 Dashboard — open to every authenticated role */}
-          <Route path="/dashboard" element={<LoginPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
 
           {/* 3.3 Vehicle Registry, 3.6 Maintenance — Fleet Manager owns fleet assets */}
           <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER]} />}>
