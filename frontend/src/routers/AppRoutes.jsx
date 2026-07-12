@@ -7,10 +7,10 @@ import AppLayout from '../components/layout/AppLayout.jsx';
 import LoginPage from '../pages/LoginPage.jsx';
 import RegisterPage from '../pages/RegisterPage.jsx';
 // import DashboardPage from '../pages/DashboardPage.jsx';
-// import VehicleRegistryPage from '../pages/VehicleRegistryPage.jsx';
+import VehicleRegistryPage from '../pages/VehicleRegistryPage.jsx';
 // import DriverManagementPage from '../pages/DriverManagementPage.jsx';
 // import TripManagementPage from '../pages/TripManagementPage.jsx';
-// import MaintenancePage from '../pages/MaintenancePage.jsx';
+import MaintenancePage from '../pages/MaintenancePage.jsx';
 // import FuelExpensePage from '../pages/FuelExpensePage.jsx';
 // import ReportsPage from '../pages/ReportsPage.jsx';
 // import UnauthorizedPage from '../pages/UnauthorizedPage.jsx';
@@ -82,10 +82,10 @@ export default function AppRoutes() {
           <Route path="/dashboard" element={<LoginPage />} />
 
           {/* 3.3 Vehicle Registry, 3.6 Maintenance — Fleet Manager owns fleet assets */}
-          {/* <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER]} />}>
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER]} />}>
             <Route path="/vehicles" element={<VehicleRegistryPage />} />
             <Route path="/maintenance" element={<MaintenancePage />} />
-          </Route> */}
+          </Route>
 
           {/* 3.4 Driver Management — Fleet Manager + Safety Officer (license/compliance) */}
           {/* <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.SAFETY_OFFICER]} />}>
