@@ -2,15 +2,8 @@ import React, { useState } from 'react';
 import { Box, Mail, Lock, ChevronDown, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { loginUser } from '../services/api';
 
-const MOCK_ROLES = [
-  { id: 'fleet_manager', label: 'Fleet Manager' },
-  { id: 'dispatcher', label: 'Dispatcher' },
-  { id: 'safety_officer', label: 'Safety Officer' },
-  { id: 'financial_analyst', label: 'Financial Analyst' },
-];
-
 export default function LoginPage({ onLoginSuccess, onNavigateToRegister }) {
-  const [formData, setFormData] = useState({ email: '', password: '', role: '' });
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -29,7 +22,6 @@ export default function LoginPage({ onLoginSuccess, onNavigateToRegister }) {
     if (!formData.email.trim()) next.email = 'Email is required.';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) next.email = 'Enter a valid email address.';
     if (!formData.password) next.password = 'Password is required.';
-    if (!formData.role) next.role = 'Select a role to continue.';
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -42,7 +34,7 @@ export default function LoginPage({ onLoginSuccess, onNavigateToRegister }) {
     setIsSubmitting(true);
     try {
       const data = await loginUser(formData);
-      onLoginSuccess?.({ token: data.token, user: { email: data.email, role: data.role } });
+      onLoginSuccess?.({ token: data.token, user: { id: data.id, email: data.email, role: data.role } });
     } catch (err) {
       if (err.response?.data?.msg) {
         setApiError(err.response.data.msg);
@@ -72,14 +64,14 @@ export default function LoginPage({ onLoginSuccess, onNavigateToRegister }) {
           {/* Mapping over MOCK_ROLES here (instead of hardcoding four <li>s)
               means this list and the <select> below always stay in sync —
               one source of truth for what roles exist. */}
-          <ul className="space-y-3">
+          {/* <ul className="space-y-3">
             {MOCK_ROLES.map((role) => (
               <li key={role.id} className="flex items-center text-slate-700">
                 <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-3" />
                 {role.label}
               </li>
             ))}
-          </ul>
+          </ul> */}
         </div>
 
         {/* ---------------- RIGHT: sign-in form ---------------- */}
@@ -104,9 +96,8 @@ export default function LoginPage({ onLoginSuccess, onNavigateToRegister }) {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Email"
-                  className={`w-full rounded-lg bg-white pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400 border ${
-                    errors.email ? 'border-red-400' : 'border-transparent'
-                  } focus:outline-none focus:ring-2 focus:ring-amber-400`}
+                  className={`w-full rounded-lg bg-white pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400 border ${errors.email ? 'border-red-400' : 'border-transparent'
+                    } focus:outline-none focus:ring-2 focus:ring-amber-400`}
                 />
               </div>
               {errors.email && <p className="text-red-300 text-xs mt-1">{errors.email}</p>}
@@ -122,9 +113,8 @@ export default function LoginPage({ onLoginSuccess, onNavigateToRegister }) {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Password"
-                  className={`w-full rounded-lg bg-white pl-10 pr-10 py-3 text-slate-900 placeholder-slate-400 border ${
-                    errors.password ? 'border-red-400' : 'border-transparent'
-                  } focus:outline-none focus:ring-2 focus:ring-amber-400`}
+                  className={`w-full rounded-lg bg-white pl-10 pr-10 py-3 text-slate-900 placeholder-slate-400 border ${errors.password ? 'border-red-400' : 'border-transparent'
+                    } focus:outline-none focus:ring-2 focus:ring-amber-400`}
                 />
                 <button
                   type="button"
@@ -136,33 +126,6 @@ export default function LoginPage({ onLoginSuccess, onNavigateToRegister }) {
                 </button>
               </div>
               {errors.password && <p className="text-red-300 text-xs mt-1">{errors.password}</p>}
-            </div>
-
-            {/* Role selection — native <select> avoids pulling in a combobox
-                dependency; MOCK_ROLES.map() generates the <option>s so this
-                stays wired to the same data as the left-panel list above. */}
-            <div>
-              <div className="relative">
-                <select
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  className={`w-full appearance-none rounded-lg bg-white pl-4 pr-10 py-3 border ${
-                    errors.role ? 'border-red-400' : 'border-transparent'
-                  } focus:outline-none focus:ring-2 focus:ring-amber-400 ${
-                    formData.role ? 'text-slate-900' : 'text-slate-400'
-                  }`}
-                >
-                  <option value="" disabled>Role Selection</option>
-                  {MOCK_ROLES.map((role) => (
-                    <option key={role.id} value={role.id} className="text-slate-900">
-                      {role.label}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
-              {errors.role && <p className="text-red-300 text-xs mt-1">{errors.role}</p>}
             </div>
 
             {/* Remember me + forgot password */}

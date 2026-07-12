@@ -1,13 +1,8 @@
-
-from fastapi import Response, status
-from app.database import database
-from app.services.jwt_handler import create_jwt
 import traceback
 from fastapi import Response, status
-from passlib.context import CryptContext
+import bcrypt
 from app.database import database
 from app.services.jwt_handler import create_jwt
-from fastapi import Response, status
 
 async def auth_regst(response: Response, data):
     db = database()
@@ -27,19 +22,22 @@ async def auth_regst(response: Response, data):
             response.status_code = status.HTTP_409_CONFLICT
             return {"msg": "Email already exists"}
 
-        # Insert new user
+        # Hash password and insert new user
+        hashed_password = bcrypt.hashpw(data.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         con.execute(
             "INSERT INTO user(email, pass, role) VALUES (%s, %s, %s)",
-            (data.email, data.password, data.role)
+            (data.email, hashed_password, data.role)
         )
 
         db.commit()
+        user_id = con.lastrowid
 
         token = create_jwt(data.email)
 
         return {
             "msg": "Registered Successfully",
-            "token": token
+            "token": token,
+            "id": user_id
         }
 
     except Exception as e:
@@ -61,7 +59,7 @@ async def auth_login(response: Response, data):
         con = db.cursor()
 
         con.execute(
-            "SELECT email, pass, role FROM user WHERE email = %s",
+            "SELECT id, email, pass, role FROM user WHERE email = %s",
             (data.email,)
         )
 
@@ -71,18 +69,25 @@ async def auth_login(response: Response, data):
             response.status_code = status.HTTP_404_NOT_FOUND
             return {"msg": "User not found"}
 
-        # user = (email, password, role)
-        if user[1] != data.password:
+        # user = (id, email, password, role)
+        try:
+            is_valid = bcrypt.checkpw(data.password.encode('utf-8'), user[2].encode('utf-8'))
+        except ValueError:
+            # Fallback for plain-text test accounts
+            is_valid = (data.password == user[2])
+
+        if not is_valid:
             response.status_code = status.HTTP_401_UNAUTHORIZED
             return {"msg": "Invalid password"}
 
-        token = create_jwt(user[0])
+        token = create_jwt(user[1])
 
         return {
             "msg": "Login Successful",
             "token": token,
-            "email": user[0],
-            "role": user[2]
+            "id": user[0],
+            "email": user[1],
+            "role": user[3]
         }
 
     except Exception as e:

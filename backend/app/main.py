@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from app.schemas.schema import UserData
+from app.schemas.schema import UserLogin, UserRegister
 from app.api.routes import router as api_router
 from app.core.config import settings
 from app.api.auth import auth_regst,auth_login
@@ -21,10 +21,10 @@ app.include_router(api_router)
 
 
 @app.post("/register")
-async def register(response: Response, data: UserData):
+async def register(response: Response, data: UserRegister):
     return await auth_regst(response, data)
 
 
 @app.post("/login")
-async def login_user(data: UserData, response: Response):
+async def login_user(data: UserLogin, response: Response):
     return await auth_login(response, data)

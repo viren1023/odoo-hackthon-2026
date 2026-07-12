@@ -45,7 +45,7 @@ export default function RegisterPage({ onRegisterSuccess, onNavigateToLogin }) {
     setIsSubmitting(true);
     try {
       const data = await registerUser(formData);
-      onRegisterSuccess?.({ token: data.token, user: { name: formData.fullName, email: formData.email, role: formData.role } });
+      onRegisterSuccess?.({ token: data.token, user: { id: data.id, name: formData.fullName, email: formData.email, role: formData.role } });
     } catch (err) {
       if (err.response?.data?.msg) {
         setApiError(err.response.data.msg);
