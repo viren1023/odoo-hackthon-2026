@@ -71,4 +71,19 @@ export const updateTripStatus = async (data) => {
   return response.data;
 };
 
+export const getMaintenance = async () => {
+  const response = await api.get('/maintenance');
+  return response.data;
+};
+
+export const registerMaintenance = async (data) => {
+  const response = await api.post('/maintenance/register', data);
+  return response.data;
+};
+
+export const updateMaintenanceStatus = async (data) => {
+  const response = await api.put('/maintenance/status', data);
+  return response.data;
+};
+
 export default api;

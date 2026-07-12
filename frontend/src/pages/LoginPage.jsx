@@ -128,7 +128,7 @@ export default function LoginPage({ onLoginSuccess, onNavigateToRegister }) {
               {errors.password && <p className="text-red-300 text-xs mt-1">{errors.password}</p>}
             </div>
 
-            {/* Remember me + forgot password */}
+            {/* Remember me */}
             <div className="flex items-center justify-between text-sm pt-1">
               <label className="flex items-center gap-2 text-slate-300 cursor-pointer select-none">
                 <input
@@ -139,9 +139,6 @@ export default function LoginPage({ onLoginSuccess, onNavigateToRegister }) {
                 />
                 Remember me
               </label>
-              <button type="button" className="text-amber-400 hover:text-amber-300">
-                Forgot password?
-              </button>
             </div>
 
             {/* Submit — disabled + spinner while the mock request is in flight,

@@ -10,7 +10,7 @@ const MOCK_ROLES = [
 ];
 
 export default function RegisterPage({ onRegisterSuccess, onNavigateToLogin }) {
-  const [formData, setFormData] = useState({ fullName: '', email: '', password: '', role: '' });
+  const [formData, setFormData] = useState({ email: '', password: '', role: '' });
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -26,7 +26,6 @@ export default function RegisterPage({ onRegisterSuccess, onNavigateToLogin }) {
 
   const validate = () => {
     const next = {};
-    if (!formData.fullName.trim()) next.fullName = 'Full name is required.';
     if (!formData.email.trim()) next.email = 'Email is required.';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) next.email = 'Enter a valid email address.';
     if (!formData.password) next.password = 'Password is required.';
@@ -45,7 +44,7 @@ export default function RegisterPage({ onRegisterSuccess, onNavigateToLogin }) {
     setIsSubmitting(true);
     try {
       const data = await registerUser(formData);
-      onRegisterSuccess?.({ token: data.token, user: { id: data.id, name: formData.fullName, email: formData.email, role: formData.role } });
+      onRegisterSuccess?.({ token: data.token, user: { id: data.id, email: formData.email, role: formData.role } });
     } catch (err) {
       if (err.response?.data?.msg) {
         setApiError(err.response.data.msg);
@@ -96,23 +95,6 @@ export default function RegisterPage({ onRegisterSuccess, onNavigateToLogin }) {
           )}
 
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
-            {/* Full Name */}
-            <div>
-              <div className="relative">
-                <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  placeholder="Full Name"
-                  className={`w-full rounded-lg bg-white pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400 border ${
-                    errors.fullName ? 'border-red-400' : 'border-transparent'
-                  } focus:outline-none focus:ring-2 focus:ring-amber-400`}
-                />
-              </div>
-              {errors.fullName && <p className="text-red-300 text-xs mt-1">{errors.fullName}</p>}
-            </div>
 
             {/* Email */}
             <div>

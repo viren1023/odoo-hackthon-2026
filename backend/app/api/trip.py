@@ -148,6 +148,9 @@ async def get_available_drivers(response: Response):
     try:
         con = db.cursor(dictionary=True)
 
+        con.execute("UPDATE drivers SET status='Expired' WHERE license_expiry_date < CURDATE() AND status != 'Expired'")
+        db.commit()
+
         con.execute(
             "SELECT * FROM drivers WHERE status=%s",
             ("Available",)

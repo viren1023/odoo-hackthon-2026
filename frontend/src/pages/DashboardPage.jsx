@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Activity, Users, Truck, AlertTriangle, Wrench, BarChart3, Filter, Route } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getVehicles, getDrivers, getTrips } from '../services/api';
+import { getVehicles, getDrivers, getTrips, getMaintenance } from '../services/api';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -9,6 +9,7 @@ export default function DashboardPage() {
   const [vehicles, setVehicles] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [trips, setTrips] = useState([]);
+  const [maintenanceRecords, setMaintenanceRecords] = useState([]);
 
   // Filters
   const [typeFilter, setTypeFilter] = useState("All");
@@ -18,14 +19,16 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [vData, dData, tData] = await Promise.all([
+        const [vData, dData, tData, mData] = await Promise.all([
           getVehicles(),
           getDrivers(),
-          getTrips()
+          getTrips(),
+          getMaintenance()
         ]);
         setVehicles(vData || []);
         setDrivers(dData || []);
         setTrips(tData || []);
+        setMaintenanceRecords(mData || []);
       } catch (err) {
         console.error("Failed to fetch dashboard data", err);
       }
@@ -33,28 +36,38 @@ export default function DashboardPage() {
     fetchData();
   }, []);
 
-  // Dummy Maintenance Data
-  const maintenanceData = [
-    { id: "MN-101", vehicle: "VAN-05", type: "Van", region: "North", issue: "Engine Oil Leak", status: "In Progress", estCompletion: "2026-07-15" },
-    { id: "MN-102", vehicle: "TRUCK-02", type: "Truck", region: "South", issue: "Brake Pad Replacement", status: "Pending Parts", estCompletion: "2026-07-18" },
-    { id: "MN-103", vehicle: "MINI-01", type: "Mini", region: "East", issue: "Tire Alignment", status: "Scheduled", estCompletion: "2026-07-13" },
-  ];
+  // Map backend maintenance records into standard format with additional info
+  const mappedMaintenance = useMemo(() => {
+    return maintenanceRecords.map(m => {
+      // Try to find vehicle for type/region (region is mocked for now)
+      const vehicle = vehicles.find(v => v.license_plate === m.license_plate);
+      return {
+        id: m.id,
+        vehicle: m.license_plate,
+        type: vehicle?.type || "Unknown",
+        region: "All", // Backend doesn't have region yet
+        issue: m.service_name,
+        status: m.status,
+        estCompletion: new Date(m.service_date).toLocaleDateString()
+      };
+    });
+  }, [maintenanceRecords, vehicles]);
 
   // Apply filters to maintenance data for demonstration
   const filteredMaintenance = useMemo(() => {
-    return maintenanceData.filter(m => {
+    return mappedMaintenance.filter(m => {
       const matchType = typeFilter === "All" || m.type === typeFilter;
       const matchStatus = statusFilter === "All" || m.status === statusFilter;
       const matchRegion = regionFilter === "All" || m.region === regionFilter;
       return matchType && matchStatus && matchRegion;
     });
-  }, [typeFilter, statusFilter, regionFilter]);
+  }, [mappedMaintenance, typeFilter, statusFilter, regionFilter]);
 
   // Derived Stats
   const totalVehicles = vehicles.length;
   const activeVehicles = vehicles.filter(v => v.status === "On Trip").length;
   const availableVehicles = vehicles.filter(v => v.status === "Available").length;
-  const maintenanceVehiclesCount = maintenanceData.length; // From dummy data
+  const maintenanceVehiclesCount = mappedMaintenance.filter(m => m.status === 'Active').length; // From real data
   const activeTripsCount = trips.filter(t => t.status === "Dispatched").length;
   const driversOnDuty = drivers.filter(d => d.status === "On Trip").length;
 
@@ -94,9 +107,8 @@ export default function DashboardPage() {
             className="bg-slate-50 border-none text-sm rounded-lg py-1.5 px-3 outline-none cursor-pointer focus:ring-2 focus:ring-amber-300"
           >
             <option value="All">All Statuses</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Pending Parts">Pending Parts</option>
-            <option value="Scheduled">Scheduled</option>
+            <option value="Active">Active</option>
+            <option value="Completed">Completed</option>
           </select>
 
           <select
@@ -179,7 +191,7 @@ export default function DashboardPage() {
       {/* Maintenance Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="p-6 border-b border-slate-100">
-          <h2 className="text-lg font-semibold text-slate-800">Vehicles in Maintenance (Dummy Data)</h2>
+          <h2 className="text-lg font-semibold text-slate-800">Vehicles in Maintenance</h2>
           <p className="text-sm text-slate-500">Track vehicles currently undergoing repairs or scheduled maintenance.</p>
         </div>
         <div className="overflow-x-auto">
@@ -206,10 +218,11 @@ export default function DashboardPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-600">{m.issue}</td>
                     <td className="px-6 py-4 text-sm">
-                      <span className={`inline-block px-2.5 py-1 rounded-md text-xs font-medium ${m.status === 'In Progress' ? 'bg-amber-100 text-amber-700' :
-                          m.status === 'Pending Parts' ? 'bg-red-100 text-red-700' :
-                            'bg-blue-100 text-blue-700'
-                        }`}>
+                      <span className={`inline-block px-2.5 py-1 rounded-md text-xs font-medium ${
+                        m.status === 'Active' ? 'bg-amber-100 text-amber-700' :
+                        m.status === 'Completed' ? 'bg-green-100 text-green-700' :
+                        'bg-blue-100 text-blue-700'
+                      }`}>
                         {m.status}
                       </span>
                     </td>

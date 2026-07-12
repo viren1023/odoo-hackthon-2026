@@ -8,7 +8,7 @@ async def register_maintenance(response: Response, data):
     con = None
 
     try:
-        con = db.cursor()
+        con = db.cursor(dictionary=True)
 
         # Check if vehicle exists
         con.execute(
@@ -41,6 +41,11 @@ async def register_maintenance(response: Response, data):
                 data.service_date
             )
         )
+        # Update vehicle status to 'In Shop'
+        con.execute(
+            "UPDATE vehicles SET status='In Shop' WHERE license_plate=%s",
+            (data.license_plate,)
+        )
 
         db.commit()
 
@@ -64,21 +69,33 @@ async def update_maintenance_status(response: Response, data):
     con = None
 
     try:
-        con = db.cursor()
+        con = db.cursor(dictionary=True)
 
         con.execute(
             "SELECT * FROM maintenance WHERE id=%s",
             (data.id,)
         )
 
-        if not con.fetchone():
+        current_record = con.fetchone()
+        
+        if not current_record:
             response.status_code = status.HTTP_404_NOT_FOUND
             return {"msg": "Maintenance record not found"}
+
+        if current_record['status'] == 'Completed':
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {"msg": "Cannot change status of a completed maintenance record"}
 
         con.execute(
             "UPDATE maintenance SET status=%s WHERE id=%s",
             (data.status, data.id)
         )
+
+        if data.status == 'Completed':
+            con.execute(
+                "UPDATE vehicles SET status='Available' WHERE license_plate=%s",
+                (current_record['license_plate'],)
+            )
 
         db.commit()
 

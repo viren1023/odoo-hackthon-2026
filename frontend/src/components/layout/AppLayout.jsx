@@ -21,12 +21,12 @@ import { useAuth } from '../../context/AuthContext.jsx';
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: null },
   { to: '/vehicles', label: 'Vehicle Registry', icon: Truck, roles: ['fleet_manager'] },
-  { to: '/drivers', label: 'Driver Management', icon: Users, roles: ['fleet_manager', 'safety_officer'] },
-  // { to: '/license-compliance', label: 'License Compliance', icon: Users, roles: ['fleet_manager', 'safety_officer'] },
-  { to: '/trips', label: 'Trips', icon: RouteIcon, roles: ['fleet_manager', 'dispatcher'] },
+  { to: '/drivers', label: 'Driver Management', icon: Users, roles: ['safety_officer'] },
+  // { to: '/license-compliance', label: 'License Compliance', icon: Users, roles: ['safety_officer'] },
+  { to: '/trips', label: 'Trips', icon: RouteIcon, roles: ['dispatcher'] },
   { to: '/maintenance', label: 'Maintenance', icon: Wrench, roles: ['fleet_manager'] },
-  { to: '/fuel-expenses', label: 'Fuel & Expenses', icon: Receipt, roles: ['fleet_manager', 'financial_analyst'] },
-  { to: '/reports', label: 'Reports', icon: BarChart3, roles: ['fleet_manager', 'financial_analyst'] },
+  { to: '/fuel-expenses', label: 'Fuel & Expenses', icon: Receipt, roles: ['financial_analyst'] },
+  { to: '/reports', label: 'Reports', icon: BarChart3, roles: ['financial_analyst'] },
   { to: '/settings', label: 'Settings', icon: Settings, roles: null },
 ];
 

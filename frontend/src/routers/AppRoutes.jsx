@@ -93,20 +93,20 @@ export default function AppRoutes() {
             <Route path="/maintenance" element={<MaintenancePage />} />
           </Route>
 
-          {/* 3.4 Driver Management — Fleet Manager + Safety Officer (license/compliance) */}
-          <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.SAFETY_OFFICER]} />}>
+          {/* 3.4 Driver Management — Safety Officer */}
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.SAFETY_OFFICER]} />}>
             <Route path="/drivers" element={<DriverManagement />} />
             <Route path="/drivers/new" element={<DriverForm />} />
             {/* <Route path="/license-compliance" element={<LicenseCompliance />} /> */}
           </Route>
 
-          {/* 3.5 Trip Management — Fleet Manager + Dispatcher */}
-          <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.DISPATCHER]} />}>
+          {/* 3.5 Trip Management — Dispatcher */}
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.DISPATCHER]} />}>
             <Route path="/trips" element={<TripManagementPage />} />
           </Route>
 
-          {/* 3.7 Fuel & Expenses, 3.8 Reports — Fleet Manager + Financial Analyst */}
-          <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.FINANCIAL_ANALYST]} />}>
+          {/* 3.7 Fuel & Expenses, 3.8 Reports — Financial Analyst */}
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.FINANCIAL_ANALYST]} />}>
             <Route path="/fuel-expenses" element={<FuelExpense />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/fuel-expenses/new" element={<ExpenseForm />} />

@@ -61,5 +61,5 @@ class MaintenanceData(BaseModel):
 
 
 class UpdateMaintenanceStatus(BaseModel):
-    license_plate: str
+    id: int
     status: str

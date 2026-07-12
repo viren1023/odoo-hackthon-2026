@@ -18,10 +18,18 @@ export default function DriverForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  const today = new Date().toISOString().split('T')[0];
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError("");
+
+    if (formData.license_expiry_date < today) {
+      setError("License expiry date cannot be in the past.");
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const dataToSubmit = {
@@ -146,6 +154,7 @@ export default function DriverForm() {
               type="date"
               name="license_expiry_date"
               required
+              min={today}
               value={formData.license_expiry_date}
               onChange={handleChange}
               className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-300 outline-none"

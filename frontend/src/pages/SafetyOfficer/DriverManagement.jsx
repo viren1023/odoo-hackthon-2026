@@ -109,16 +109,18 @@ export default function DriverManagement() {
                     <select
                       value={driver.status}
                       onChange={(e) => handleStatusChange(driver.license_number, e.target.value)}
-                      disabled={driver.status === 'On Trip'}
-                      className={`px-2 py-1 rounded-full text-xs font-medium border-none outline-none appearance-none cursor-pointer ${driver.status === 'Available' ? 'bg-green-100 text-green-700' :
+                      disabled={driver.status === 'On Trip' || driver.status === 'Expired'}
+                      className={`px-2 py-1 rounded-full text-xs font-medium border-none outline-none appearance-none ${driver.status === 'Available' ? 'bg-green-100 text-green-700 cursor-pointer' :
                           driver.status === 'On Trip' ? 'bg-blue-100 text-blue-700 opacity-70 cursor-not-allowed' :
-                            'bg-slate-100 text-slate-700'
+                          driver.status === 'Expired' ? 'bg-red-100 text-red-700 opacity-80 cursor-not-allowed' :
+                            'bg-slate-100 text-slate-700 cursor-pointer'
                         }`}
                     >
                       <option value="Available">Available</option>
                       <option value="On Trip">On Trip</option>
                       <option value="Off Duty">Off Duty</option>
                       <option value="Suspended">Suspended</option>
+                      {driver.status === 'Expired' && <option value="Expired">Expired</option>}
                     </select>
                   </td>
                 </tr>
