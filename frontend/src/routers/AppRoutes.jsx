@@ -5,6 +5,7 @@ import ProtectedRoute from './ProtectedRoute.jsx';
 import AppLayout from '../components/layout/AppLayout.jsx';
 import DriverManagement from "../pages/SafetyOfficer/DriverManagement";
 import DriverForm from "../pages/SafetyOfficer/DriverForm";
+import LicenseCompliance from "../pages/SafetyOfficer/LicenseCompliance";
 import LoginPage from '../pages/LoginPage.jsx';
 import RegisterPage from '../pages/RegisterPage.jsx';
 import DashboardPage from '../pages/DashboardPage.jsx';
@@ -95,6 +96,7 @@ export default function AppRoutes() {
           <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.SAFETY_OFFICER]} />}>
             <Route path="/drivers" element={<DriverManagement />} />
             <Route path="/drivers/new" element={<DriverForm />} />
+            <Route path="/license-compliance" element={<LicenseCompliance />} />
           </Route>
 
           {/* 3.5 Trip Management — Fleet Manager + Dispatcher */}
