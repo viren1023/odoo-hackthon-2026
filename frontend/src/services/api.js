@@ -21,4 +21,9 @@ export const registerUser = async (data) => {
   return response.data;
 };
 
+export const registerVehicle = async (data) => {
+  const response = await api.post('/vehicle_register', data);
+  return response.data;
+};
+
 export default api;

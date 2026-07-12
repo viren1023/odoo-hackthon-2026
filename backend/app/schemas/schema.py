@@ -16,6 +16,8 @@ class VehicleData(BaseModel):
     license_plate: str
     type: str
     capacity: int
+    odometer: float
+    acquisition_cost: float
     status: str
 
 

@@ -25,7 +25,7 @@ async def register_vehicle(response: Response, data):
             """
             INSERT INTO vehicles
             (uid, Vname, license_plate, type, capacity, odometer, acquisition_cost, status)
-            VALUES (%s, %s, %s, %s, %s, 0, 0, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """,
             (
                 data.uid,
@@ -33,6 +33,8 @@ async def register_vehicle(response: Response, data):
                 data.license_plate,
                 data.type,
                 data.capacity,
+                data.odometer,
+                data.acquisition_cost,
                 data.status
             )
         )
