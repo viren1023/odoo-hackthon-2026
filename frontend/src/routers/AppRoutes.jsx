@@ -3,7 +3,8 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import AppLayout from '../components/layout/AppLayout.jsx';
-
+import DriverManagement from "../pages/SafetyOfficer/DriverManagement";
+import DriverForm from "../pages/SafetyOfficer/DriverForm";
 import LoginPage from '../pages/LoginPage.jsx';
 import RegisterPage from '../pages/RegisterPage.jsx';
 import DashboardPage from '../pages/DashboardPage.jsx';
@@ -88,9 +89,10 @@ export default function AppRoutes() {
           </Route>
 
           {/* 3.4 Driver Management — Fleet Manager + Safety Officer (license/compliance) */}
-          {/* <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.SAFETY_OFFICER]} />}>
-            <Route path="/drivers" element={<DriverManagementPage />} />
-          </Route> */}
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.SAFETY_OFFICER]}/>}>
+          <Route path="/drivers" element={<DriverManagement />} />
+          <Route path="/drivers/new" element={<DriverForm />} />
+          </Route>
 
           {/* 3.5 Trip Management — Fleet Manager + Dispatcher */}
           {/* <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.DISPATCHER]} />}>
