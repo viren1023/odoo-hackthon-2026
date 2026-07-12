@@ -51,3 +51,15 @@ class TripData(BaseModel):
 class UpdateTripStatus(BaseModel):
     trip_id: int
     status: str
+
+
+class MaintenanceData(BaseModel):
+    license_plate: str
+    service_name: str
+    cost: float
+    service_date: str
+
+
+class UpdateMaintenanceStatus(BaseModel):
+    license_plate: str
+    status: str
