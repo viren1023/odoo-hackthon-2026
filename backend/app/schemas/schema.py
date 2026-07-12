@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 from pydantic import BaseModel
 
 class UserLogin(BaseModel):
@@ -37,3 +37,13 @@ class DriverData(BaseModel):
 class UpdateDriverStatus(BaseModel):
     license_number: str
     status: str
+
+class TripData(BaseModel):
+    uid: int
+    source: Optional[str] = None
+    destination: Optional[str] = None
+    vehicle_id: Optional[int] = None
+    driver_id: Optional[int] = None
+    cargo_weight: Optional[float] = None
+    distance: Optional[float] = None
+    status: Optional[str] = "Draft"
