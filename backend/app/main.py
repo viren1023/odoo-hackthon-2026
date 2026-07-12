@@ -1,22 +1,25 @@
-from fastapi import FastAPI
+
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from app.schemas.schema import UserData
 from app.api.routes import router as api_router
 from app.core.config import settings
+from app.api.auth import regst
 
-def get_application() -> FastAPI:
-    application = FastAPI(title=settings.PROJECT_NAME)
+app = FastAPI(title=settings.PROJECT_NAME)
 
-    # Set all CORS enabled origins
-    application.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.BACKEND_CORS_ORIGINS,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-    application.include_router(api_router)
+app.include_router(api_router)
 
-    return application
 
-app = get_application()
+@app.post("/register")
+async def register(response: Response, data: UserData):
+    return await regst(response, data)

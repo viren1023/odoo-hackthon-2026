@@ -21,3 +21,8 @@ This is the backend for the FastAPI + React Starter.
    ```
 
 The backend runs on `http://localhost:8000`.
+
+
+CREATE DATABASE TransitOps;
+
+CREATE TABLE `user` (    id INT AUTO_INCREMENT UNIQUE,    email VARCHAR(255) NOT NULL,    pass VARCHAR(255) NOT NULL,    role VARCHAR(50) NOT NULL);
