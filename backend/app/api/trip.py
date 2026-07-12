@@ -77,6 +77,22 @@ async def create_trip(response: Response, data):
             )
         )
 
+        trip_id = con.lastrowid
+
+# If trip is dispatched, mark driver and vehicle as on trip
+        if data.status == "Dispatch":
+            if data.vehicle_id is not None:
+                con.execute(
+            "UPDATE vehicles SET status=%s WHERE id=%s",
+            ("On Trip", data.vehicle_id)
+            )
+
+        if data.driver_id is not None:
+            con.execute(
+            "UPDATE drivers SET status=%s WHERE id=%s",
+            ("On Trip", data.driver_id)
+            )
+
         db.commit()
 
         response.status_code = status.HTTP_201_CREATED
