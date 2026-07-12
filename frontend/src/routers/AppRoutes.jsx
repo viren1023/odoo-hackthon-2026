@@ -13,13 +13,14 @@ import VehicleRegistryPage from '../pages/VehicleregisterayPage.jsx'
 // import DriverManagementPage from '../pages/DriverManagementPage.jsx';
 import TripManagementPage from '../pages/TripsPage'
 import MaintenancePage from '../pages/MaintenencePage.jsx'
-// import FuelExpensePage from '../pages/FuelExpensePage.jsx';
-// import ReportsPage from '../pages/ReportsPage.jsx';
+import FuelExpense from '../pages/Financial/FuelExpenses.jsx';
+import Reports from '../pages/Financial/Reports.jsx';
 // import UnauthorizedPage from '../pages/UnauthorizedPage.jsx';
 // import NotFoundPage from '../pages/NotFoundPage.jsx';
 import SettingsPage from '../pages/SettingsPage.jsx';
 import AboutUsPage from '../pages/AboutUsPage.jsx';
 import TermsAndConditionPage from '../pages/Terms&ConditionPage.jsx';
+import ExpenseForm from "../pages/Financial/ExpenseForm";
 
 // ----------------------------------------------------------------------------
 // ROLE ACCESS MAP
@@ -96,7 +97,7 @@ export default function AppRoutes() {
           <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.SAFETY_OFFICER]} />}>
             <Route path="/drivers" element={<DriverManagement />} />
             <Route path="/drivers/new" element={<DriverForm />} />
-            <Route path="/license-compliance" element={<LicenseCompliance />} />
+            {/* <Route path="/license-compliance" element={<LicenseCompliance />} /> */}
           </Route>
 
           {/* 3.5 Trip Management — Fleet Manager + Dispatcher */}
@@ -105,12 +106,12 @@ export default function AppRoutes() {
           </Route>
 
           {/* 3.7 Fuel & Expenses, 3.8 Reports — Fleet Manager + Financial Analyst */}
-          {/* <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.FINANCIAL_ANALYST]} />}>
-            <Route path="/fuel-expenses" element={<FuelExpensePage />} />
-            <Route path="/reports" element={<ReportsPage />} />
-          </Route> */}
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.FINANCIAL_ANALYST]} />}>
+            <Route path="/fuel-expenses" element={<FuelExpense />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/fuel-expenses/new" element={<ExpenseForm />} />
+          </Route>
 
-          {/* Settings, About Us, Terms - available to everyone */}
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/about-us" element={<AboutUsPage />} />
           <Route path="/terms" element={<TermsAndConditionPage />} />
