@@ -26,4 +26,24 @@ export const registerVehicle = async (data) => {
   return response.data;
 };
 
+export const getVehicles = async () => {
+  const response = await api.get('/get_vehicles');
+  return response.data;
+};
+
+export const getDrivers = async () => {
+  const response = await api.get('/get_drivers');
+  return response.data;
+};
+
+export const addDriver = async (data) => {
+  const response = await api.post('/driver_add', data);
+  return response.data;
+};
+
+export const updateDriverStatus = async (data) => {
+  const response = await api.put('/driver_status', data);
+  return response.data;
+};
+
 export default api;

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   LayoutDashboard,
   Truck,
@@ -17,7 +17,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useAuth } from '../context/AuthContext';
-import { registerVehicle } from '../services/api';
+import { registerVehicle, getVehicles } from '../services/api';
 
 // Standalone Vehicle Registry ("Fleet") screen for TransitOps.
 // Includes the full app shell (sidebar + topbar) since this page is always
@@ -27,6 +27,28 @@ export default function VehicleRegistryPage() {
   
   // Vehicles state to hold registered fleet.
   const [vehicles, setVehicles] = useState([]);
+
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const data = await getVehicles();
+        const formattedData = data.map(v => ({
+          id: v.id,
+          regNo: v.license_plate,
+          name: v.Vname,
+          type: v.type,
+          capacity: v.capacity,
+          odometer: v.odometer,
+          acqCost: v.acquisition_cost,
+          status: v.status
+        }));
+        setVehicles(formattedData);
+      } catch (err) {
+        console.error("Failed to fetch vehicles", err);
+      }
+    };
+    fetchVehicles();
+  }, []);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ Vname: '', license_plate: '', type: 'Van', capacity: '', odometer: '', acqCost: '', status: 'Available' });

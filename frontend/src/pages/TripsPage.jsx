@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from "react";
 import {
-  LayoutDashboard,
   Truck,
   Users,
   Route as RouteIcon,
@@ -125,67 +124,9 @@ export default function TripsPage() {
     Cancelled: "bg-red-600 text-white",
   };
 
-  const navItems = [
-    { label: "Dashboard", icon: LayoutDashboard },
-    { label: "Fleet", icon: Truck },
-    { label: "Drivers", icon: Users },
-    { label: "Trips", icon: RouteIcon, active: true },
-    { label: "Maintenance", icon: Wrench },
-    { label: "Fuel & Expenses", icon: Fuel },
-    { label: "Analytics", icon: BarChart3 },
-    { label: "Settings", icon: Settings },
-  ];
-
   return (
-    <div className="min-h-screen w-full bg-white flex text-slate-900">
-      {/* Sidebar */}
-      <aside className="w-56 border-r border-slate-200 flex flex-col p-5 shrink-0">
-        <div className="flex items-center gap-2 mb-8 px-1">
-          <Box className="w-5 h-5 text-slate-900" strokeWidth={1.75} />
-          <span className="text-lg font-bold">TransitOps</span>
-        </div>
-        <nav className="flex flex-col gap-1">
-          {navItems.map(({ label, icon: Icon, active }) => (
-            <button
-              key={label}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-colors ${
-                active
-                  ? "bg-amber-50 text-slate-900 font-medium"
-                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-              }`}
-            >
-              <Icon className="w-4 h-4" strokeWidth={1.75} />
-              {label}
-            </button>
-          ))}
-        </nav>
-      </aside>
+    <div className="p-8 flex-1 w-full bg-white text-slate-900 h-full overflow-auto">
 
-      {/* Main column */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Topbar */}
-        <header className="flex items-center gap-6 px-8 py-4 border-b border-slate-200">
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full pl-9 pr-4 py-2 bg-slate-100 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-300"
-            />
-          </div>
-          <div className="ml-auto flex items-center gap-3">
-            <div className="text-right leading-tight">
-              <p className="text-sm font-semibold text-slate-900">Raven K.</p>
-              <p className="text-xs text-slate-500">Dispatcher</p>
-            </div>
-            <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center">
-              <User className="w-4 h-4 text-slate-500" />
-            </div>
-          </div>
-        </header>
-
-        {/* Page content */}
-        <main className="p-8 flex-1 overflow-auto">
           <h1 className="text-2xl font-bold text-slate-900 mb-6">Trip Dispatcher</h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-10">
@@ -379,8 +320,6 @@ export default function TripsPage() {
               </div>
             </div>
           </div>
-        </main>
-      </div>
     </div>
   );
 }

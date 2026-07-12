@@ -10,7 +10,7 @@ import {
   BarChart3,
   LogOut,
   Box,
-  Search,
+  Settings,
   User,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -26,6 +26,7 @@ const NAV_ITEMS = [
   { to: '/maintenance', label: 'Maintenance', icon: Wrench, roles: ['fleet_manager'] },
   { to: '/fuel-expenses', label: 'Fuel & Expenses', icon: Receipt, roles: ['fleet_manager', 'financial_analyst'] },
   { to: '/reports', label: 'Reports', icon: BarChart3, roles: ['fleet_manager', 'financial_analyst'] },
+  { to: '/settings', label: 'Settings', icon: Settings, roles: null },
 ];
 
 const ROLE_LABELS = {
@@ -89,14 +90,7 @@ export default function AppLayout() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Dynamic Topbar */}
         <header className="flex items-center gap-6 px-8 py-4 border-b border-slate-200 bg-white">
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full pl-9 pr-4 py-2 bg-slate-100 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-300"
-            />
-          </div>
+          <div className="flex-1"></div>
           <div className="ml-auto flex items-center gap-3">
             <div className="text-right leading-tight">
               <p className="text-sm font-semibold text-slate-900">{user?.name || user?.email || 'User'}</p>

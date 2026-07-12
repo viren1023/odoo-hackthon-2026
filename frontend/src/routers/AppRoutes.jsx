@@ -10,12 +10,15 @@ import RegisterPage from '../pages/RegisterPage.jsx';
 import DashboardPage from '../pages/DashboardPage.jsx';
 import VehicleRegistryPage from '../pages/VehicleregisterayPage.jsx'
 // import DriverManagementPage from '../pages/DriverManagementPage.jsx';
-import TripManagementPage from '../pages/TripManagementPage.jsx';
+import TripManagementPage from '../pages/TripsPage'
 import MaintenancePage from '../pages/MaintenencePage.jsx'
 // import FuelExpensePage from '../pages/FuelExpensePage.jsx';
 // import ReportsPage from '../pages/ReportsPage.jsx';
 // import UnauthorizedPage from '../pages/UnauthorizedPage.jsx';
 // import NotFoundPage from '../pages/NotFoundPage.jsx';
+import SettingsPage from '../pages/SettingsPage.jsx';
+import AboutUsPage from '../pages/AboutUsPage.jsx';
+import TermsAndConditionPage from '../pages/Terms&ConditionPage.jsx';
 
 // ----------------------------------------------------------------------------
 // ROLE ACCESS MAP
@@ -89,21 +92,26 @@ export default function AppRoutes() {
           </Route>
 
           {/* 3.4 Driver Management — Fleet Manager + Safety Officer (license/compliance) */}
-          <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.SAFETY_OFFICER]}/>}>
-          <Route path="/drivers" element={<DriverManagement />} />
-          <Route path="/drivers/new" element={<DriverForm />} />
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.SAFETY_OFFICER]} />}>
+            <Route path="/drivers" element={<DriverManagement />} />
+            <Route path="/drivers/new" element={<DriverForm />} />
           </Route>
 
           {/* 3.5 Trip Management — Fleet Manager + Dispatcher */}
-          {/* <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.DISPATCHER]} />}>
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.DISPATCHER]} />}>
             <Route path="/trips" element={<TripManagementPage />} />
-          </Route> */}
+          </Route>
 
           {/* 3.7 Fuel & Expenses, 3.8 Reports — Fleet Manager + Financial Analyst */}
           {/* <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.FINANCIAL_ANALYST]} />}>
             <Route path="/fuel-expenses" element={<FuelExpensePage />} />
             <Route path="/reports" element={<ReportsPage />} />
           </Route> */}
+
+          {/* Settings, About Us, Terms - available to everyone */}
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/about-us" element={<AboutUsPage />} />
+          <Route path="/terms" element={<TermsAndConditionPage />} />
         </Route>
       </Route>
 
