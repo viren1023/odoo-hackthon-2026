@@ -13,10 +13,11 @@ import VehicleRegistryPage from '../pages/VehicleregisterayPage.jsx'
 // import DriverManagementPage from '../pages/DriverManagementPage.jsx';
 // import TripManagementPage from '../pages/TripManagementPage.jsx';
 import MaintenancePage from '../pages/MaintenencePage.jsx'
-// import FuelExpensePage from '../pages/FuelExpensePage.jsx';
-// import ReportsPage from '../pages/ReportsPage.jsx';
+import FuelExpense from '../pages/Financial/FuelExpense.jsx';
+import Reports from '../pages/Financial/Reports.jsx';
 // import UnauthorizedPage from '../pages/UnauthorizedPage.jsx';
 // import NotFoundPage from '../pages/NotFoundPage.jsx';
+import ExpenseForm from "../pages/Financial/ExpenseForm";
 
 // ----------------------------------------------------------------------------
 // ROLE ACCESS MAP
@@ -102,12 +103,14 @@ export default function AppRoutes() {
           </Route> */}
 
           {/* 3.7 Fuel & Expenses, 3.8 Reports — Fleet Manager + Financial Analyst */}
-          {/* <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.FINANCIAL_ANALYST]} />}>
-            <Route path="/fuel-expenses" element={<FuelExpensePage />} />
-            <Route path="/reports" element={<ReportsPage />} />
-          </Route> */}
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.FLEET_MANAGER, ROLES.FINANCIAL_ANALYST]}/>}>
+          <Route path="/fuel-expenses" element={<FuelExpenses />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/fuel-expenses/new" element={<ExpenseForm />} />
+        
         </Route>
-      </Route>
+                </Route>
+              </Route>
 
       {/* ---------------- Fallbacks ---------------- */}
       {/* <Route path="/unauthorized" element={<UnauthorizedPage />} /> */}
