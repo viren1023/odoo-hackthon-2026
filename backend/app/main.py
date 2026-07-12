@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from app.schemas.schema import DriverData, MaintenanceData, TripData, UpdateDriverStatus, UpdateMaintenanceStatus, UserLogin, UserRegister, VehicleData,UpdateVehicleStatus, UpdateTripStatus
+from app.schemas.schema import DriverData, MaintenanceData, TripData, UpdateDriverStatus, UpdateMaintenanceStatus, UserId, UserLogin, UserRegister, VehicleData,UpdateVehicleStatus, UpdateTripStatus
 from app.api.routes import router as api_router
 from app.core.config import settings
 from app.api.auth import auth_regst,auth_login
@@ -44,9 +44,9 @@ async def vehicle_status(data: UpdateVehicleStatus, response: Response):
     return await update_vehicle_status(response, data)
 
 
-@app.get("/get_vehicles")
-async def vehicles(response: Response):
-    return await get_all_vehicles(response)
+@app.post("/vehicles")
+async def vehicles(data: UserId, response: Response):
+    return await get_all_vehicles(response, data)
 
 @app.post("/driver_add")
 async def driver(data: DriverData, response: Response):
@@ -56,10 +56,9 @@ async def driver(data: DriverData, response: Response):
 async def driver_status(data: UpdateDriverStatus, response: Response):
     return await update_driver_status(response, data)
 
-@app.get("/get_drivers")
-async def drivers(response: Response):
-    return await get_all_drivers(response)
-
+@app.post("/drivers")
+async def drivers(data: UserId, response: Response):
+    return await get_all_drivers(response, data)
 
 @app.post("/trip")
 async def save_trip(data: TripData, response: Response):
@@ -77,8 +76,8 @@ async def available_drivers(response: Response):
 
 
 @app.get("/get_trips")
-async def get_trips(response: Response):
-    return await get_all_trips(response)
+async def get_trips(data: UserId, response: Response):
+    return await get_all_trips(response, data)
 
 
 @app.put("/trip_status")
@@ -96,6 +95,6 @@ async def maintenance_status(data: UpdateMaintenanceStatus, response: Response):
     return await update_maintenance_status(response, data)
 
 
-@app.get("/maintenance")
-async def maintenance(response: Response):
-    return await get_all_maintenance(response)
+@app.post("/maintenance")
+async def maintenance(data: UserId, response: Response):
+    return await get_all_maintenance(response, data)

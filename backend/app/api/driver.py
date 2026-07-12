@@ -106,14 +106,17 @@ async def update_driver_status(response: Response, data):
 
 
 
-async def get_all_drivers(response: Response):
+async def get_all_drivers(response: Response, data):
     db = database()
     con = None
 
     try:
         con = db.cursor(dictionary=True)
 
-        con.execute("SELECT * FROM drivers")
+        con.execute(
+            "SELECT * FROM drivers WHERE uid=%s",
+            (data.uid,)
+        )
 
         drivers = con.fetchall()
 

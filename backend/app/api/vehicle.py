@@ -94,14 +94,17 @@ async def update_vehicle_status(response: Response, data):
         db.close()
 
 
-async def get_all_vehicles(response: Response):
+async def get_all_vehicles(response: Response, data):
     db = database()
     con = None
 
     try:
         con = db.cursor(dictionary=True)
 
-        con.execute("SELECT * FROM vehicles")
+        con.execute(
+            "SELECT * FROM vehicles WHERE uid=%s",
+            (data.uid,)
+        )
 
         vehicles = con.fetchall()
 

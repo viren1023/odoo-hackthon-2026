@@ -10,15 +10,19 @@ async def register_maintenance(response: Response, data):
     try:
         con = db.cursor()
 
-        # Check if vehicle exists
+        # Check if vehicle exists and belongs to the user
         con.execute(
-            "SELECT * FROM vehicles WHERE license_plate=%s",
-            (data.license_plate,)
+            """
+            SELECT id
+            FROM vehicles
+            WHERE license_plate=%s AND uid=%s
+            """,
+            (data.license_plate, data.uid)
         )
 
         if not con.fetchone():
             response.status_code = status.HTTP_404_NOT_FOUND
-            return {"msg": "Vehicle not found"}
+            return {"msg": "Vehicle not found or does not belong to you"}
 
         # Add maintenance record
         con.execute(
@@ -97,15 +101,29 @@ async def update_maintenance_status(response: Response, data):
         db.close()
 
 
-async def get_all_maintenance(response: Response):
+async def get_all_maintenance(response: Response, data):
     db = database()
     con = None
 
     try:
         con = db.cursor(dictionary=True)
 
-        con.execute("SELECT * FROM maintenance")
+        query = """
+            SELECT
+                m.id,
+                m.license_plate,
+                m.service_name,
+                m.cost,
+                m.service_date,
+                m.status
+            FROM maintenance m
+            INNER JOIN vehicles v
+                ON m.license_plate = v.license_plate
+            WHERE v.uid = %s
+            ORDER BY m.id DESC
+        """
 
+        con.execute(query, (data.uid,))
         maintenance = con.fetchall()
 
         response.status_code = status.HTTP_200_OK

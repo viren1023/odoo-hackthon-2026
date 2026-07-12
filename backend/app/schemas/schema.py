@@ -54,6 +54,7 @@ class UpdateTripStatus(BaseModel):
 
 
 class MaintenanceData(BaseModel):
+    uid: int
     license_plate: str
     service_name: str
     cost: float
@@ -61,5 +62,9 @@ class MaintenanceData(BaseModel):
 
 
 class UpdateMaintenanceStatus(BaseModel):
-    license_plate: str
+    id: int
     status: str
+
+
+class UserId(BaseModel):
+    uid: int
