@@ -9,7 +9,7 @@ import RegisterPage from '../pages/RegisterPage.jsx';
 import DashboardPage from '../pages/DashboardPage.jsx';
 import VehicleRegistryPage from '../pages/VehicleregisterayPage.jsx'
 // import DriverManagementPage from '../pages/DriverManagementPage.jsx';
-// import TripManagementPage from '../pages/TripManagementPage.jsx';
+import TripManagementPage from '../pages/TripManagementPage.jsx';
 import MaintenancePage from '../pages/MaintenencePage.jsx'
 // import FuelExpensePage from '../pages/FuelExpensePage.jsx';
 // import ReportsPage from '../pages/ReportsPage.jsx';
