@@ -189,11 +189,15 @@ async def get_all_trips(response: Response, data):
             FROM trip t
             LEFT JOIN vehicles v ON t.vehicle_id = v.id
             LEFT JOIN drivers d ON t.driver_id = d.id
-            WHERE t.uid = %s
-            ORDER BY t.id DESC
         """
-
-        con.execute(query, (data.uid,))
+        
+        if data.uid != 0:
+            query += " WHERE t.uid = %s "
+            query += " ORDER BY t.id DESC "
+            con.execute(query, (data.uid,))
+        else:
+            query += " ORDER BY t.id DESC "
+            con.execute(query)
         trips = con.fetchall()
 
         response.status_code = status.HTTP_200_OK

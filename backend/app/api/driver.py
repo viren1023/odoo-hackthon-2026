@@ -113,10 +113,13 @@ async def get_all_drivers(response: Response, data):
     try:
         con = db.cursor(dictionary=True)
 
-        con.execute(
-            "SELECT * FROM drivers WHERE uid=%s",
-            (data.uid,)
-        )
+        if data.uid != 0:
+            con.execute(
+                "SELECT * FROM drivers WHERE uid=%s",
+                (data.uid,)
+            )
+        else:
+            con.execute("SELECT * FROM drivers")
 
         drivers = con.fetchall()
 

@@ -101,10 +101,13 @@ async def get_all_vehicles(response: Response, data):
     try:
         con = db.cursor(dictionary=True)
 
-        con.execute(
-            "SELECT * FROM vehicles WHERE uid=%s",
-            (data.uid,)
-        )
+        if data.uid != 0:
+            con.execute(
+                "SELECT * FROM vehicles WHERE uid=%s",
+                (data.uid,)
+            )
+        else:
+            con.execute("SELECT * FROM vehicles")
 
         vehicles = con.fetchall()
 
