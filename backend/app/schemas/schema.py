@@ -22,3 +22,16 @@ class VehicleData(BaseModel):
 class UpdateVehicleStatus(BaseModel):
     license_plate: str
     status: str
+
+
+class DriverData(BaseModel):
+    uid: int
+    name: str
+    category: str
+    license_number: str
+    license_expiry_date: str
+    contact: str
+
+class UpdateDriverStatus(BaseModel):
+    license_number: str
+    status: str
