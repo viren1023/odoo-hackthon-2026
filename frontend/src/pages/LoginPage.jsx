@@ -1,18 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Mail, Lock, ChevronDown, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
-
-// ============================================================================
-// MOCK DATA — stands in for real FastAPI backend responses during dev/demo.
-// Replace the two items below with real endpoints when the backend is ready:
-//   GET  /api/v1/roles        -> MOCK_ROLES
-//   POST /api/v1/auth/login   -> mockLoginRequest()
-//
-// Demo credentials (for judges/testers to try the flow end-to-end):
-//   fleet@transitops.io      / fleet123    / Fleet Manager
-//   dispatch@transitops.io   / dispatch123 / Dispatcher
-//   safety@transitops.io     / safety123   / Safety Officer
-//   finance@transitops.io    / finance123  / Financial Analyst
-// ============================================================================
+import { loginUser } from '../services/api';
 
 const MOCK_ROLES = [
   { id: 'fleet_manager', label: 'Fleet Manager' },
@@ -21,58 +9,18 @@ const MOCK_ROLES = [
   { id: 'financial_analyst', label: 'Financial Analyst' },
 ];
 
-const MOCK_USERS_DB = [
-  { email: 'fleet@transitops.io', password: 'fleet123', role: 'fleet_manager', name: 'Priya Shah' },
-  { email: 'dispatch@transitops.io', password: 'dispatch123', role: 'dispatcher', name: 'Alex Rivera' },
-  { email: 'safety@transitops.io', password: 'safety123', role: 'safety_officer', name: 'Jordan Lee' },
-  { email: 'finance@transitops.io', password: 'finance123', role: 'financial_analyst', name: 'Sam Patel' },
-];
-
-// Simulated network round-trip. Swap the body for a real
-// `fetch('/api/v1/auth/login', { method: 'POST', body: ... })` later —
-// the calling code below doesn't need to change since it already awaits
-// a promise that resolves/rejects the same shape.
-function mockLoginRequest({ email, password, role }) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const match = MOCK_USERS_DB.find((u) => u.email.toLowerCase() === email.toLowerCase());
-      if (!match) return reject({ field: 'email', message: 'No account found with this email.' });
-      if (match.password !== password) return reject({ field: 'password', message: 'Incorrect password.' });
-      if (match.role !== role) {
-        const actualLabel = MOCK_ROLES.find((r) => r.id === match.role)?.label ?? match.role;
-        return reject({ field: 'role', message: `This account is registered as ${actualLabel}, not the selected role.` });
-      }
-      resolve({ token: `mock-jwt-token.${btoa(email)}`, user: { name: match.name, email: match.email, role: match.role } });
-    }, 900); // artificial latency so the loading state is visible in the demo
-  });
-}
-
-/**
- * Standalone Login page. Self-contained: brings its own mock data, its own
- * validation, and its own submit handling. Two optional callback props let
- * a parent (e.g. a router or App.jsx) hook into the result without this
- * component needing to know about routing:
- *   - onLoginSuccess(result)     called with { token, user } on success
- *   - onNavigateToRegister()     called when the user taps "Create one"
- */
 export default function LoginPage({ onLoginSuccess, onNavigateToRegister }) {
-  // Single object for the three form fields — keeps them together and lets
-  // one generic handleChange cover every input via its `name` attribute,
-  // instead of one useState per field.
   const [formData, setFormData] = useState({ email: '', password: '', role: '' });
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Field-level errors keyed by field name so each input renders its own
-  // message inline, rather than one big conditional block.
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [apiError, setApiError] = useState(''); // non-field errors (network, etc.)
+  const [apiError, setApiError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear that field's error the moment the user starts fixing it.
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
@@ -93,19 +41,20 @@ export default function LoginPage({ onLoginSuccess, onNavigateToRegister }) {
 
     setIsSubmitting(true);
     try {
-      const result = await mockLoginRequest(formData);
-      onLoginSuccess?.(result);
+      const data = await loginUser(formData);
+      onLoginSuccess?.({ token: data.token, user: { email: data.email, role: data.role } });
     } catch (err) {
-      if (err?.field) setErrors((prev) => ({ ...prev, [err.field]: err.message }));
-      else setApiError('Something went wrong. Please try again.');
+      if (err.response?.data?.msg) {
+        setApiError(err.response.data.msg);
+      } else {
+        setApiError('Something went wrong. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    // Page wrapper: centers the auth card on a neutral slate-100 backdrop.
-    // The card itself (not this wrapper) carries the actual brand palette.
     <div className="min-h-screen w-full flex items-center justify-center bg-slate-100 p-4 sm:p-6">
       <div className="w-full max-w-5xl bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col md:flex-row">
 

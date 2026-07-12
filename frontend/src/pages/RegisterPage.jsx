@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Mail, Lock, User, ChevronDown, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
-
-// ============================================================================
-// MOCK DATA — stands in for real FastAPI backend responses during dev/demo.
-// Replace the two items below with real endpoints when the backend is ready:
-//   GET  /api/v1/roles           -> MOCK_ROLES
-//   POST /api/v1/auth/register   -> mockRegisterRequest()
-// ============================================================================
+import { registerUser } from '../services/api';
 
 const MOCK_ROLES = [
   { id: 'fleet_manager', label: 'Fleet Manager' },
@@ -15,54 +9,14 @@ const MOCK_ROLES = [
   { id: 'financial_analyst', label: 'Financial Analyst' },
 ];
 
-// Emails already "taken" — lets the demo show a realistic uniqueness
-// error without a real backend running.
-const MOCK_EXISTING_EMAILS = [
-  'fleet@transitops.io',
-  'dispatch@transitops.io',
-  'safety@transitops.io',
-  'finance@transitops.io',
-];
-
-// Simulated network round-trip. Swap the body for a real
-// `fetch('/api/v1/auth/register', { method: 'POST', body: ... })` later —
-// the calling code below already awaits a promise of this same shape.
-function mockRegisterRequest({ fullName, email, password, role }) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (MOCK_EXISTING_EMAILS.includes(email.toLowerCase())) {
-        return reject({ field: 'email', message: 'An account with this email already exists.' });
-      }
-      resolve({
-        token: `mock-jwt-token.${btoa(email)}`,
-        user: { name: fullName, email, role },
-      });
-    }, 900); // artificial latency so the loading state is visible in the demo
-  });
-}
-
-/**
- * Standalone Registration page. Self-contained: brings its own mock data,
- * validation, and submit handling. Two optional callback props let a parent
- * (router / App.jsx) react to the result without this component needing to
- * know about routing:
- *   - onRegisterSuccess(result)   called with { token, user } on success
- *   - onNavigateToLogin()         called when the user taps "Sign In"
- */
 export default function RegisterPage({ onRegisterSuccess, onNavigateToLogin }) {
-  // One object for all four fields — a single generic handleChange (keyed
-  // off each input's `name` attribute) covers all of them instead of four
-  // separate useState calls.
   const [formData, setFormData] = useState({ fullName: '', email: '', password: '', role: '' });
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Field-level errors keyed by field name so each input shows its own
-  // inline message; a separate flag covers the terms checkbox since it
-  // isn't part of formData.
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [apiError, setApiError] = useState(''); // non-field errors (network, etc.)
+  const [apiError, setApiError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -90,11 +44,14 @@ export default function RegisterPage({ onRegisterSuccess, onNavigateToLogin }) {
 
     setIsSubmitting(true);
     try {
-      const result = await mockRegisterRequest(formData);
-      onRegisterSuccess?.(result);
+      const data = await registerUser(formData);
+      onRegisterSuccess?.({ token: data.token, user: { name: formData.fullName, email: formData.email, role: formData.role } });
     } catch (err) {
-      if (err?.field) setErrors((prev) => ({ ...prev, [err.field]: err.message }));
-      else setApiError('Something went wrong. Please try again.');
+      if (err.response?.data?.msg) {
+        setApiError(err.response.data.msg);
+      } else {
+        setApiError('Something went wrong. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
