@@ -31,7 +31,8 @@ export default function VehicleRegistryPage() {
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
-        const data = await getVehicles();
+        const uid = user?.id || 1;
+        const data = await getVehicles(uid);
         const formattedData = data.map(v => ({
           id: v.id,
           regNo: v.license_plate,

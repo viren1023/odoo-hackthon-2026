@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { getMaintenance, registerMaintenance, updateMaintenanceStatus, getVehicles } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 export default function MaintenancePage() {
+  const { user } = useAuth();
   const [vehicleOptions, setVehicleOptions] = useState([]);
   const [serviceLog, setServiceLog] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,9 +23,10 @@ export default function MaintenancePage() {
   const fetchInitialData = async () => {
     setIsLoading(true);
     try {
+      const uid = user?.id || 1;
       const [maintenanceData, vehicleData] = await Promise.all([
-        getMaintenance(),
-        getVehicles()
+        getMaintenance(uid),
+        getVehicles(uid)
       ]);
       
       setServiceLog(maintenanceData || []);
@@ -81,7 +84,8 @@ export default function MaintenancePage() {
     try {
       await updateMaintenanceStatus({ id, status: newStatus });
       // Refresh the log
-      const updatedLogs = await getMaintenance();
+      const uid = user?.id || 1;
+      const updatedLogs = await getMaintenance(uid);
       setServiceLog(updatedLogs || []);
     } catch (err) {
       console.error("Failed to update status", err);

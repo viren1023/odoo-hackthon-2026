@@ -19,16 +19,17 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [vData, dData, tData, mData] = await Promise.all([
-          getVehicles(),
-          getDrivers(),
-          getTrips(),
-          getMaintenance()
+        const uid = user?.id || 1;
+        const [vehiclesData, driversData, tripsData, maintenanceData] = await Promise.all([
+          getVehicles(uid),
+          getDrivers(uid),
+          getTrips(uid),
+          getMaintenance(uid)
         ]);
-        setVehicles(vData || []);
-        setDrivers(dData || []);
-        setTrips(tData || []);
-        setMaintenanceRecords(mData || []);
+        setVehicles(vehiclesData || []);
+        setDrivers(driversData || []);
+        setTrips(tripsData || []);
+        setMaintenanceRecords(maintenanceData || []);
       } catch (err) {
         console.error("Failed to fetch dashboard data", err);
       }

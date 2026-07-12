@@ -75,7 +75,7 @@ async def available_drivers(response: Response):
     return await get_available_drivers(response)
 
 
-@app.get("/get_trips")
+@app.post("/get_trips")
 async def get_trips(data: UserId, response: Response):
     return await get_all_trips(response, data)
 

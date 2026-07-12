@@ -63,7 +63,6 @@ class MaintenanceData(BaseModel):
 
 class UpdateMaintenanceStatus(BaseModel):
     id: int
-    id: int
     status: str
 
 

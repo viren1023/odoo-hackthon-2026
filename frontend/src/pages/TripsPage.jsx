@@ -47,7 +47,7 @@ export default function TripsPage() {
         const [vehiclesRes, driversRes, tripsRes] = await Promise.all([
           getAvailableVehicles(),
           getAvailableDrivers(),
-          getTrips(),
+          getTrips(user?.id || 1),
         ]);
         setAvailableVehicles(vehiclesRes || []);
         setAvailableDrivers(driversRes || []);
@@ -146,8 +146,8 @@ export default function TripsPage() {
       setAvailableVehicles(prev => prev.filter(v => v.id.toString() !== form.vehicleId));
       setAvailableDrivers(prev => prev.filter(d => d.id.toString() !== form.driverId));
       
-      // Also fetch trips again to refresh board properly
-      const tripsRes = await getTrips();
+      // Also fetch trips again      // Refresh trips list
+      const tripsRes = await getTrips(user?.id || 1);
       if (tripsRes) {
         const formattedTrips = tripsRes.map(t => ({
           id: `TR${t.id}`,

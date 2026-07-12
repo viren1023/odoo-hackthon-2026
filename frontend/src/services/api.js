@@ -26,13 +26,13 @@ export const registerVehicle = async (data) => {
   return response.data;
 };
 
-export const getVehicles = async () => {
-  const response = await api.get('/get_vehicles');
+export const getVehicles = async (uid) => {
+  const response = await api.post('/vehicles', { uid });
   return response.data;
 };
 
-export const getDrivers = async () => {
-  const response = await api.get('/get_drivers');
+export const getDrivers = async (uid) => {
+  const response = await api.post('/drivers', { uid });
   return response.data;
 };
 
@@ -61,8 +61,8 @@ export const createTrip = async (data) => {
   return response.data;
 };
 
-export const getTrips = async () => {
-  const response = await api.get('/get_trips');
+export const getTrips = async (uid) => {
+  const response = await api.post('/get_trips', { uid });
   return response.data;
 };
 
@@ -71,8 +71,8 @@ export const updateTripStatus = async (data) => {
   return response.data;
 };
 
-export const getMaintenance = async () => {
-  const response = await api.get('/maintenance');
+export const getMaintenance = async (uid) => {
+  const response = await api.post('/maintenance', { uid });
   return response.data;
 };
 

@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDrivers, updateDriverStatus } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
+
 export default function DriverManagement() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDrivers = async () => {
       try {
-        const data = await getDrivers();
+        const uid = user?.id || 1;
+        const data = await getDrivers(uid);
         setDrivers(data);
       } catch (err) {
         console.error("Failed to fetch drivers", err);
