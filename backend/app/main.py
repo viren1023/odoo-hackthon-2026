@@ -8,7 +8,7 @@ from app.core.config import settings
 from app.api.auth import auth_regst,auth_login
 from app.api.vehicle import get_all_vehicles, register_vehicle,update_vehicle_status
 from app.api.driver import add_driver, get_all_drivers, update_driver_status
-from backend.app.api.trip import create_trip, get_available_drivers, get_available_vehicles
+from app.api.trip import create_trip, get_available_drivers, get_available_vehicles
 
 app = FastAPI(title=settings.PROJECT_NAME)
 

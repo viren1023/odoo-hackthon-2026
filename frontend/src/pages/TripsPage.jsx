@@ -1,4 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { getAvailableVehicles, getAvailableDrivers, createTrip } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 import {
   Truck,
   Users,
@@ -20,66 +22,61 @@ import {
 // a valid trip prepends it to the live board, simulating a POST /api/trips
 // call followed by a re-fetch - the same pattern used on the Maintenance page.
 export default function TripsPage() {
-  // Mock fleet/driver data, shaped like GET /api/vehicles?status=Available
-  // and GET /api/drivers?status=Available. Only available resources are
-  // offered in the dropdowns, per the "(Available only)" labels in the design.
-  const availableVehicles = [
-    { id: "VAN-05", capacity: 500 },
-    { id: "MINI-02", capacity: 750 },
-    { id: "TRUCK-07", capacity: 3000 },
-  ];
-  const availableDrivers = ["Alex", "Priya", "Suresh"];
+  const [availableVehicles, setAvailableVehicles] = useState([]);
+  const [availableDrivers, setAvailableDrivers] = useState([]);
+  const [isLoadingResources, setIsLoadingResources] = useState(true);
+  const { user } = useAuth(); // Assume we're importing useAuth
 
   const lifecycleStages = ["Draft", "Dispatched", "Completed", "Cancelled"];
 
-  // Mock "live board" rows, shaped like GET /api/trips?recent=true.
-  const [liveBoard, setLiveBoard] = useState([
-    {
-      id: "TR003",
-      source: "Gandhinagar Depot",
-      destination: "Ahmedabad Hub",
-      assignment: "VAN-05 / Alex",
-      status: "Dispatched",
-      note: "45 min",
-    },
-    {
-      id: "TR004",
-      source: "Vatva Industrial Area",
-      destination: "Sanand Warehouse",
-      assignment: "TRUCK-04 / Suresh",
-      status: "Draft",
-      note: "Awaiting driver",
-    },
-    {
-      id: "TR006",
-      source: "Mansa",
-      destination: "Kalol Depot",
-      assignment: "Unassigned",
-      status: "Cancelled",
-      note: "Vehicle went to shop",
-    },
-  ]);
-
-  // Create-trip form state. Pre-filled to mirror the source design, which
-  // also happens to demonstrate the capacity-exceeded validation state.
+  const [liveBoard, setLiveBoard] = useState([]);
   const [form, setForm] = useState({
     source: "Gandhinagar Depot",
     destination: "Ahmedabad Hub",
-    vehicleId: "VAN-05",
-    driver: "Alex",
+    vehicleId: "",
+    driverId: "",
     cargoWeight: "700",
     plannedDistance: "38",
   });
-
-  // Tracks the lifecycle stage of the trip currently being drafted, so the
-  // stepper at the top reflects real state instead of always sitting on "Draft".
   const [currentStage, setCurrentStage] = useState("Draft");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const [vehiclesRes, driversRes] = await Promise.all([
+          getAvailableVehicles(),
+          getAvailableDrivers(),
+        ]);
+        setAvailableVehicles(vehiclesRes || []);
+        setAvailableDrivers(driversRes || []);
+        
+        if (vehiclesRes?.length > 0 && driversRes?.length > 0) {
+          setForm(prev => ({
+            ...prev,
+            vehicleId: vehiclesRes[0].id.toString(),
+            driverId: driversRes[0].id.toString()
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to fetch available resources", error);
+      } finally {
+        setIsLoadingResources(false);
+      }
+    };
+    fetchResources();
+  }, []);
 
   const updateField = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
 
   const selectedVehicle = useMemo(
-    () => availableVehicles.find((v) => v.id === form.vehicleId),
-    [form.vehicleId]
+    () => availableVehicles.find((v) => v.id.toString() === form.vehicleId),
+    [availableVehicles, form.vehicleId]
+  );
+  
+  const selectedDriver = useMemo(
+    () => availableDrivers.find((d) => d.id.toString() === form.driverId),
+    [availableDrivers, form.driverId]
   );
 
   const cargoWeightNum = Number(form.cargoWeight) || 0;
@@ -87,34 +84,61 @@ export default function TripsPage() {
   const isOverCapacity = overweightBy > 0;
 
   const canDispatch =
-    form.source && form.destination && form.vehicleId && form.driver && cargoWeightNum > 0 && !isOverCapacity;
+    form.source && form.destination && form.vehicleId && form.driverId && cargoWeightNum > 0 && !isOverCapacity && !isSubmitting;
 
   const resetForm = () => {
     setForm({
       source: "Gandhinagar Depot",
       destination: "",
-      vehicleId: availableVehicles[0].id,
-      driver: availableDrivers[0],
+      vehicleId: availableVehicles.length > 0 ? availableVehicles[0].id.toString() : "",
+      driverId: availableDrivers.length > 0 ? availableDrivers[0].id.toString() : "",
       cargoWeight: "",
       plannedDistance: "",
     });
     setCurrentStage("Draft");
   };
 
-  const handleDispatch = () => {
+  const handleDispatch = async () => {
     if (!canDispatch) return;
-    const newTrip = {
-      id: `TR${Math.floor(100 + Math.random() * 900)}`,
+    setIsSubmitting(true);
+    
+    const payload = {
+      uid: user?.id || 1,
       source: form.source,
       destination: form.destination,
-      assignment: `${form.vehicleId} / ${form.driver}`,
+      vehicle_id: parseInt(form.vehicleId, 10),
+      driver_id: parseInt(form.driverId, 10),
+      cargo_weight: cargoWeightNum,
+      distance: Number(form.plannedDistance) || 0,
       status: "Dispatched",
-      note: "Just dispatched",
     };
-    setLiveBoard((board) => [newTrip, ...board]);
-    setCurrentStage("Dispatched");
-    // Briefly show "Dispatched" on the stepper, then reset the form for the next trip.
-    setTimeout(resetForm, 1200);
+
+    try {
+      const response = await createTrip(payload);
+      
+      const newTrip = {
+        id: `TR${response.trip_id || Math.floor(100 + Math.random() * 900)}`,
+        source: form.source,
+        destination: form.destination,
+        assignment: `${selectedVehicle?.Vname || form.vehicleId} / ${selectedDriver?.name || form.driverId}`,
+        status: "Dispatched",
+        note: "Just dispatched",
+      };
+      
+      setLiveBoard((board) => [newTrip, ...board]);
+      setCurrentStage("Dispatched");
+      
+      // Update local available arrays directly or re-fetch
+      setAvailableVehicles(prev => prev.filter(v => v.id.toString() !== form.vehicleId));
+      setAvailableDrivers(prev => prev.filter(d => d.id.toString() !== form.driverId));
+      
+      setTimeout(resetForm, 1200);
+    } catch (err) {
+      console.error("Failed to dispatch trip", err);
+      alert(err.response?.data?.msg || "Failed to dispatch trip");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const statusStyles = {
@@ -194,7 +218,7 @@ export default function TripsPage() {
                     >
                       {availableVehicles.map((v) => (
                         <option key={v.id} value={v.id}>
-                          {v.id} — {v.capacity} kg capacity
+                          {v.Vname} — {v.capacity} kg capacity
                         </option>
                       ))}
                     </select>
@@ -208,13 +232,13 @@ export default function TripsPage() {
                   </label>
                   <div className="relative">
                     <select
-                      value={form.driver}
-                      onChange={updateField("driver")}
+                      value={form.driverId}
+                      onChange={updateField("driverId")}
                       className="appearance-none w-full border border-slate-200 rounded-lg px-3 py-2.5 pr-9 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-300"
                     >
                       {availableDrivers.map((d) => (
-                        <option key={d} value={d}>
-                          {d}
+                        <option key={d.id} value={d.id}>
+                          {d.name} — {d.category}
                         </option>
                       ))}
                     </select>

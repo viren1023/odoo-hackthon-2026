@@ -46,4 +46,19 @@ export const updateDriverStatus = async (data) => {
   return response.data;
 };
 
+export const getAvailableVehicles = async () => {
+  const response = await api.get('/vehicles_available');
+  return response.data;
+};
+
+export const getAvailableDrivers = async () => {
+  const response = await api.get('/drivers_available');
+  return response.data;
+};
+
+export const createTrip = async (data) => {
+  const response = await api.post('/trip', data);
+  return response.data;
+};
+
 export default api;
