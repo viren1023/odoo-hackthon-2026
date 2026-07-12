@@ -136,11 +136,16 @@ async def get_all_maintenance(response: Response, data):
             FROM maintenance m
             INNER JOIN vehicles v
                 ON m.license_plate = v.license_plate
-            WHERE v.uid = %s
-            ORDER BY m.id DESC
         """
-
-        con.execute(query, (data.uid,))
+        
+        if data.uid != 0:
+            query += " WHERE v.uid = %s "
+            query += " ORDER BY m.id DESC "
+            con.execute(query, (data.uid,))
+        else:
+            query += " ORDER BY m.id DESC "
+            con.execute(query)
+            
         maintenance = con.fetchall()
 
         response.status_code = status.HTTP_200_OK

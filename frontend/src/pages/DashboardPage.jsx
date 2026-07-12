@@ -219,11 +219,10 @@ export default function DashboardPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-600">{m.issue}</td>
                     <td className="px-6 py-4 text-sm">
-                      <span className={`inline-block px-2.5 py-1 rounded-md text-xs font-medium ${
-                        m.status === 'Active' ? 'bg-amber-100 text-amber-700' :
-                        m.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                        'bg-blue-100 text-blue-700'
-                      }`}>
+                      <span className={`inline-block px-2.5 py-1 rounded-md text-xs font-medium ${m.status === 'Active' ? 'bg-amber-100 text-amber-700' :
+                          m.status === 'Completed' ? 'bg-green-100 text-green-700' :
+                            'bg-blue-100 text-blue-700'
+                        }`}>
                         {m.status}
                       </span>
                     </td>
